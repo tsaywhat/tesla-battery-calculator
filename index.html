@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tesla Trip Battery Calculator</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 500px; margin: 40px auto; padding: 20px; }
+    h1 { text-align: center; }
+    label { display: block; margin-top: 15px; }
+    select, input, button { width: 100%; padding: 10px; margin: 10px 0; font-size: 16px; }
+    .result { margin-top: 20px; padding: 15px; background: #f0f0f0; border-radius: 8px; }
+  </style>
+</head>
+<body>
+
+  <h1>🚗 Tesla Trip Calculator</h1>
+
+  <label for="modelSelect">Select Tesla Model</label>
+  <select id="modelSelect" onchange="updateRange()">
+    <option value="">-- Select Model --</option>
+    <option value="513">Model 3 RWD (Standard/Highlander) - 513 km</option>
+    <option value="629">Model 3 Long Range (Highlander) - 629 km</option>
+    <option value="528">Model 3 Performance (Highlander) - 528 km</option>
+    <option value="455">Model Y RWD - 455 km</option>
+    <option value="533">Model Y Long Range - 533 km</option>
+    <option value="514">Model Y Performance - 514 km</option>
+  </select>
+
+  <label>Full Range (km) (Editable)</label>
+  <input type="number" id="fullRange" placeholder="e.g., 500" value="500">
+
+  <label>Current Battery (%)</label>
+  <input type="number" id="currentBattery" placeholder="e.g., 74" min="1" max="100">
+
+  <label>Total Trip Distance (km)</label>
+  <input type="number" id="tripDistance" placeholder="e.g., 175">
+
+  <button onclick="calculate()">Calculate</button>
+
+  <div id="result" class="result" style="display:none;"></div>
+
+  <script>
+    // Auto-update full range when a model is selected
+    function updateRange() {
+      const modelSelect = document.getElementById('modelSelect');
+      const fullRangeInput = document.getElementById('fullRange');
+      const selectedRange = modelSelect.value;
+      if (selectedRange) {
+        fullRangeInput.value = selectedRange;
+      }
+    }
+
+    // Main calculation function
+    function calculate() {
+      const currentBattery = parseFloat(document.getElementById('currentBattery').value);
+      const tripDistance = parseFloat(document.getElementById('tripDistance').value);
+      const fullRange = parseFloat(document.getElementById('fullRange').value);
+
+      if (isNaN(currentBattery) || isNaN(tripDistance) || isNaN(fullRange)) {
+        alert('Please fill in all fields correctly!');
+        return;
+      }
+
+      const kmPerPercent = fullRange / 100;
+      const percentUsed = tripDistance / kmPerPercent;
+      const batteryLeft = currentBattery - percentUsed;
+
+      let message = `🔋 Estimated battery used: <strong>${percentUsed.toFixed(1)}%</strong><br>`;
+      message += `✅ Estimated battery left after trip: <strong>${batteryLeft.toFixed(1)}%</strong>`;
+
+      if (batteryLeft < 0) {
+        message += `<br><br>⚠️ Warning: You do not have enough battery for this trip!`;
+      }
+
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = message;
+      resultDiv.style.display = 'block';
+    }
+  </script>
+
+</body>
+</html>
